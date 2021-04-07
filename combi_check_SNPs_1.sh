@@ -29,46 +29,46 @@ mkdir -p ${wd}
 # Format headers and set up
 # Save GWAS catalog header for later show with the results
 
-#    head -n1 ${folder}/${associ} > ${folder}/header_GWASCat
-#    echo "Identifying the list of studies for..." ${disease}
-#    
-#    # Identify the list of studies for this trait from the GWAS Catalog association file
-#    awk -F'\t' -v OFS='\t' -v t="${trait}" '$35 == t'  ${folder}/${associ} | cut -f37 | sort | uniq > ${wd}/list_studies_${disease}
-#    
-#    echo "Searching population/ancestry info..."    
-#    # Search the list of studies exclusively for the trait and their pop info
-#    grep -wf ${wd}/list_studies_${disease} ${ances} > ${wd}/info_studies_${disease}
-#    
-#    # Discard those studies performed exclusively in East Asians
-#    # Remove also the WTCCC study itself from the list of studies returning SNPs for the trait in europeans
-#    awk  -F'\t' -v OFS='\t' '$9 != "East Asian"' ${wd}/info_studies_${disease} |  awk -F'\t' -v OFS='\t' '$2 != "17554300"' | cut -f1 | sort | uniq > ${wd}/studies_with_Europeans_${disease}
-#    
-#    # Full info for studies selected
-#    grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}"/"${associ} > ${wd}/${disease}.assoc
-#    
-#    # SNPs coming from studies in Europeans
-#    grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}/${associ} | cut -f2,12,13,22 | sort -nk1,1 | awk '{print "chr"$2"\t"$3"\t"$3+1"\t"$4"\t"$1}' | sort | uniq > ${wd}/${disease}_snps2019_hg38.bed
-#    
-#    # Format SNPs for liftOver. !!!REQUIRES THE chr* CHROMOSOME FORMAT!!!
-#    awk -F'\t' -v OFS='\t' '{print $1,$2,$3,$4}' ${wd}/${disease}_snps2019_hg38.bed | sort | uniq | grep -v '_\|;\|X\|:\|x' | sortBed > ${wd}/${disease}_snps2019_hg38_format.bed
-#     
-#    # Get the positions for the input SNPs from DeepCOMBI
-#    while read R; do 
-#        mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -Dhg19 -N -e "select concat(chrom,' ',chromEnd,' ',chromEnd+1,' ',name ) from snp142 where name='${R}'"; 
-#    done < <(awk '{print $2}' ${folder}/snps_to_check_27_09_2019/${disease}_upto_10-4.txt | sed 1d) > ${wd}/snps_combi_${disease}.bed
-#    
-#    # Format DeepCOMBI SNPs into a bed format
-#    sed -i -e 's/chr//g' -e 's/ /\t/g' ${wd}/snps_combi_${disease}.bed;
-#    
-#    # LIFTOVER CATALOG SNPS (requires the binary for liftOver, dowloadable from UCSC)
-#    /home/jrodriguez/cluster_projects/metaloci/liftOver ${wd}/${disease}_snps2019_hg38_format.bed ${folder}/hg38ToHg19.over.chain.gz ${wd}/${disease}_hg38_to_hg19.bed ${wd}/unmapped_${disease}_hg38_to_hg19
-#    
-#    # Now remove the chr* format.
-#    sed -i 's/chr//g' ${wd}/${disease}_hg38_to_hg19.bed
-#    
-#    # Concatenate them altogether
-#    cat ${wd}/${disease}_hg38_to_hg19.bed  ${wd}/snps_combi_${disease}.bed | sortBed > ${wd}/full_${disease}.bed
-#    
+head -n1 ${folder}/${associ} > ${folder}/header_GWASCat
+echo "Identifying the list of studies for..." ${disease}
+
+# Identify the list of studies for this trait from the GWAS Catalog association file
+awk -F'\t' -v OFS='\t' -v t="${trait}" '$35 == t'  ${folder}/${associ} | cut -f37 | sort | uniq > ${wd}/list_studies_${disease}
+
+echo "Searching population/ancestry info..."    
+# Search the list of studies exclusively for the trait and their pop info
+grep -wf ${wd}/list_studies_${disease} ${ances} > ${wd}/info_studies_${disease}
+
+# Discard those studies performed exclusively in East Asians
+# Remove also the WTCCC study itself from the list of studies returning SNPs for the trait in europeans
+awk  -F'\t' -v OFS='\t' '$9 != "East Asian"' ${wd}/info_studies_${disease} |  awk -F'\t' -v OFS='\t' '$2 != "17554300"' | cut -f1 | sort | uniq > ${wd}/studies_with_Europeans_${disease}
+
+# Full info for studies selected
+grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}"/"${associ} > ${wd}/${disease}.assoc
+
+# SNPs coming from studies in Europeans
+grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}/${associ} | cut -f2,12,13,22 | sort -nk1,1 | awk '{print "chr"$2"\t"$3"\t"$3+1"\t"$4"\t"$1}' | sort | uniq > ${wd}/${disease}_snps2019_hg38.bed
+
+# Format SNPs for liftOver. !!!REQUIRES THE chr* CHROMOSOME FORMAT!!!
+awk -F'\t' -v OFS='\t' '{print $1,$2,$3,$4}' ${wd}/${disease}_snps2019_hg38.bed | sort | uniq | grep -v '_\|;\|X\|:\|x' | sortBed > ${wd}/${disease}_snps2019_hg38_format.bed
+ 
+# Get the positions for the input SNPs from DeepCOMBI
+while read R; do 
+    mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -Dhg19 -N -e "select concat(chrom,' ',chromEnd,' ',chromEnd+1,' ',name ) from snp142 where name='${R}'"; 
+done < <(awk '{print $2}' ${folder}/snps_to_check_27_09_2019/${disease}_upto_10-4.txt | sed 1d) > ${wd}/snps_combi_${disease}.bed
+
+# Format DeepCOMBI SNPs into a bed format
+sed -i -e 's/chr//g' -e 's/ /\t/g' ${wd}/snps_combi_${disease}.bed;
+
+# LIFTOVER CATALOG SNPS (requires the binary for liftOver, dowloadable from UCSC)
+/home/jrodriguez/cluster_projects/metaloci/liftOver ${wd}/${disease}_snps2019_hg38_format.bed ${folder}/hg38ToHg19.over.chain.gz ${wd}/${disease}_hg38_to_hg19.bed ${wd}/unmapped_${disease}_hg38_to_hg19
+
+# Now remove the chr* format.
+sed -i 's/chr//g' ${wd}/${disease}_hg38_to_hg19.bed
+
+# Concatenate them altogether
+cat ${wd}/${disease}_hg38_to_hg19.bed  ${wd}/snps_combi_${disease}.bed | sortBed > ${wd}/full_${disease}.bed
+
 # Make a dir to store VCFs...
 mkdir -p ${wd}"/snps";
 cd ${wd}"/snps";
