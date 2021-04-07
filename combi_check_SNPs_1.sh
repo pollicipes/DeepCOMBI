@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# This controls the bash pipelines
 set -Eeuxo pipefail;
 
 # gwas catalog associations from https://www.ebi.ac.uk/gwas/docs/file-downloads
