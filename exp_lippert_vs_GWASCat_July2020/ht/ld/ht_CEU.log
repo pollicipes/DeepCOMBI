@@ -1,0 +1,17 @@
+
+VCFtools - 0.1.15
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--vcf /home/jrodriguez/Projects/DeepCOMBI///exp_lippert_vs_GWASCat_July2020//ht//snps/allhtSNPs_sort.vcf
+	--keep /home/jrodriguez/Projects/DeepCOMBI//CEU_indv.txt
+	--out /home/jrodriguez/Projects/DeepCOMBI///exp_lippert_vs_GWASCat_July2020//ht//ld/ht_CEU
+	--plink
+
+Keeping individuals in 'keep' list
+After filtering, kept 85 out of 2504 Individuals
+Writing PLINK PED and MAP files ... 
+	PLINK: Only outputting biallelic loci.
+Done.
+After filtering, kept 234 out of a possible 234 Sites
+Run Time = 2.00 seconds

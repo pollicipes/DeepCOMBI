@@ -1,0 +1,32 @@
+PLINK v1.90b5.1 64-bit (20 Dec 2017)
+Options in effect:
+  --bfile /home/jrodriguez/Projects/DeepCOMBI///exp_lippert_vs_GWASCat_July2020//t1d//ld/t1d_CEU_rs
+  --ld-snp rs9501161
+  --ld-window 99999
+  --ld-window-kb 500
+  --ld-window-r2 0.2
+  --out /home/jrodriguez/Projects/DeepCOMBI///exp_lippert_vs_GWASCat_July2020//t1d//ld/rs9501161
+  --r2
+  --silent
+
+Hostname: gos
+Working directory: /home/jrodriguez/Projects/DeepCOMBI
+Start time: Tue May  4 14:59:36 2021
+
+Random number seed: 1620133176
+48226 MB RAM detected; reserving 24113 MB for main workspace.
+215 variants loaded from .bim file.
+85 people (0 males, 0 females, 85 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/jrodriguez/Projects/DeepCOMBI///exp_lippert_vs_GWASCat_July2020//t1d//ld/rs9501161.nosex
+.
+Using up to 23 threads (change this with --threads).
+Before main variant filters, 85 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+215 variants and 85 people pass filters and QC.
+Note: No phenotypes present.
+--r2 to
+/home/jrodriguez/Projects/DeepCOMBI///exp_lippert_vs_GWASCat_July2020//t1d//ld/rs9501161.ld
+... done.
+
+End time: Tue May  4 14:59:36 2021

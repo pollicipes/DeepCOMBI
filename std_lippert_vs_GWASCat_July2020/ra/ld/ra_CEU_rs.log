@@ -1,0 +1,45 @@
+PLINK v1.90b5.1 64-bit (20 Dec 2017)
+Options in effect:
+  --extract /home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//snps/snps_to_keep.rs
+  --file /home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU
+  --make-bed
+  --out /home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs
+
+Hostname: gos
+Working directory: /home/jrodriguez/Projects/DeepCOMBI
+Start time: Tue May  4 12:10:01 2021
+
+Random number seed: 1620123001
+48226 MB RAM detected; reserving 24113 MB for main workspace.
+Scanning .ped file...
+Possibly irregular .ped line.  Restarting scan, assuming multichar alleles.
+.ped scan complete (for binary autoconversion).
+Performing single-pass .bed write (371 variants, 85 people).
+--file:
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs-temporary.bed
++
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs-temporary.bim
++
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs-temporary.fam
+written.
+371 variants loaded from .bim file.
+85 people (0 males, 0 females, 85 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs.nosex
+.
+--extract: 312 variants remaining.
+Warning: At least 2 duplicate IDs in --extract file.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 85 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+312 variants and 85 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs.bed
++
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs.bim
++
+/home/jrodriguez/Projects/DeepCOMBI///std_lippert_vs_GWASCat_July2020//ra//ld/ra_CEU_rs.fam
+... done.
+
+End time: Tue May  4 12:10:01 2021
