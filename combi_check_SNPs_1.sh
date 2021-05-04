@@ -11,8 +11,14 @@ associ="gwas_catalog_v1.0.2-associations_e100_r2020-06-30.tsv"
 ances="gwas_catalog-ancestry_r2020-06-30.tsv"
 # folder for the project
 folder="/home/jrodriguez/Projects/DeepCOMBI/"
+
+# Data set to test:
+group="snps_to_check_27_09_2019" #"exp_lippert"
+
 # results
-dis_folder="/snps_to_check_27_09_2019_vs_GWASCat_July2020/"
+#dis_folder="/snps_to_check_27_09_2019_vs_GWASCat_July2020/"
+dis_folder="/"${group}"_vs_GWASCat_July2020/"
+
 # trait as reported in catalog associations EFO classifications
 #trait="bipolar disorder"
 trait=$1
@@ -37,17 +43,17 @@ awk -F'\t' -v OFS='\t' -v t="${trait}" '$35 == t'  ${folder}/${associ} | cut -f3
 
 echo "Searching population/ancestry info..."    
 # Search the list of studies exclusively for the trait and their pop info
-grep -wf ${wd}/list_studies_${disease} ${ances} > ${wd}/info_studies_${disease}
+LC_ALL=C grep -wf ${wd}/list_studies_${disease} ${ances} > ${wd}/info_studies_${disease}
 
 # Discard those studies performed exclusively in East Asians
 # Remove also the WTCCC study itself from the list of studies returning SNPs for the trait in europeans
 awk  -F'\t' -v OFS='\t' '$9 != "East Asian"' ${wd}/info_studies_${disease} |  awk -F'\t' -v OFS='\t' '$2 != "17554300"' | cut -f1 | sort | uniq > ${wd}/studies_with_Europeans_${disease}
 
 # Full info for studies selected
-grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}"/"${associ} > ${wd}/${disease}.assoc
+LC_ALL=C grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}"/"${associ} > ${wd}/${disease}.assoc
 
 # SNPs coming from studies in Europeans
-grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}/${associ} | cut -f2,12,13,22 | sort -nk1,1 | awk '{print "chr"$2"\t"$3"\t"$3+1"\t"$4"\t"$1}' | sort | uniq > ${wd}/${disease}_snps2019_hg38.bed
+LC_ALL=C grep -wf ${wd}/studies_with_Europeans_${disease} ${folder}/${associ} | cut -f2,12,13,22 | sort -nk1,1 | awk '{print "chr"$2"\t"$3"\t"$3+1"\t"$4"\t"$1}' | sort | uniq > ${wd}/${disease}_snps2019_hg38.bed
 
 # Format SNPs for liftOver. !!!REQUIRES THE chr* CHROMOSOME FORMAT!!!
 awk -F'\t' -v OFS='\t' '{print $1,$2,$3,$4}' ${wd}/${disease}_snps2019_hg38.bed | sort | uniq | grep -v '_\|;\|X\|:\|x' | sortBed > ${wd}/${disease}_snps2019_hg38_format.bed
@@ -55,7 +61,14 @@ awk -F'\t' -v OFS='\t' '{print $1,$2,$3,$4}' ${wd}/${disease}_snps2019_hg38.bed 
 # Get the positions for the input SNPs from DeepCOMBI
 while read R; do 
     mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -Dhg19 -N -e "select concat(chrom,' ',chromEnd,' ',chromEnd+1,' ',name ) from snp142 where name='${R}'"; 
-done < <(awk '{print $2}' ${folder}/snps_to_check_27_09_2019/${disease}_upto_10-4.txt | sed 1d) > ${wd}/snps_combi_${disease}.bed
+
+done < <(awk '{print $2}' ${folder}/${group}/${disease}"_upto_10-4.txt") > ${wd}/snps_combi_${disease}.l.bed
+
+# use this format to work with the Lippert test.
+#done < <(awk '{print $2}' ${folder}/${group}/all.${disease}.txt) > ${wd}/snps_combi_${disease}.l.bed
+
+# Remove weird HLA chromosome mappings
+grep -v '_' ${wd}/snps_combi_${disease}.l.bed > ${wd}/snps_combi_${disease}.bed
 
 # Format DeepCOMBI SNPs into a bed format
 sed -i -e 's/chr//g' -e 's/ /\t/g' ${wd}/snps_combi_${disease}.bed;
@@ -91,7 +104,6 @@ cd ${folder};
 # A dir to store LD data.
 mkdir -p ${wd}"/ld";
 
-
 ### PART II ###
 ## Its adviceable to run first part I, and then continue with this part II
 ## Part I is basically for downloading and getting base info for the SNPs
@@ -105,7 +117,6 @@ echo "Calculating LD..."
 vcf-concat ${wd}"/snps/"rs*.vcf > ${wd}"/snps/"all${disease}SNPs.vcf
 # sort
 vcf-sort ${wd}"/snps/"all${disease}SNPs.vcf > ${wd}"/snps/"all${disease}SNPs_sort.vcf
-
 # Select the European individuals (n=85) genotypes to calculate LD and output it in bed format for plink
 vcftools --vcf ${wd}"/snps/"all${disease}SNPs_sort.vcf --keep  ${folder}/CEU_indv.txt --plink --out ${wd}"/ld/"${disease}_CEU;
 
