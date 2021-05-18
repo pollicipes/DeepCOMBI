@@ -13,8 +13,8 @@ ances="gwas_catalog-ancestry_r2020-06-30.tsv"
 folder="/home/jrodriguez/Projects/DeepCOMBI/"
 
 # Data set to test:
-group="snps_to_check_27_09_2019" #"exp_lippert"
-
+group="lmm_lippert_020" #"lmm_lippert_STRONG_PRUNE" #"snps_to_check_27_09_2019"
+r2thresh='0.2'
 # results
 #dis_folder="/snps_to_check_27_09_2019_vs_GWASCat_July2020/"
 dis_folder="/"${group}"_vs_GWASCat_July2020/"
@@ -61,11 +61,11 @@ awk -F'\t' -v OFS='\t' '{print $1,$2,$3,$4}' ${wd}/${disease}_snps2019_hg38.bed 
 # Get the positions for the input SNPs from DeepCOMBI
 while read R; do 
     mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -Dhg19 -N -e "select concat(chrom,' ',chromEnd,' ',chromEnd+1,' ',name ) from snp142 where name='${R}'"; 
+    # use this format to work with the Lippert test.
+done < <(awk '{print $2}' ${folder}/${group}/all.${disease}.txt) > ${wd}/snps_combi_${disease}.l.bed
 
-done < <(awk '{print $2}' ${folder}/${group}/${disease}"_upto_10-4.txt") > ${wd}/snps_combi_${disease}.l.bed
+#done < <(awk '{print $2}' ${folder}/${group}/${disease}"_upto_10-4.txt") > ${wd}/snps_combi_${disease}.l.bed
 
-# use this format to work with the Lippert test.
-#done < <(awk '{print $2}' ${folder}/${group}/all.${disease}.txt) > ${wd}/snps_combi_${disease}.l.bed
 
 # Remove weird HLA chromosome mappings
 grep -v '_' ${wd}/snps_combi_${disease}.l.bed > ${wd}/snps_combi_${disease}.bed
@@ -130,7 +130,7 @@ plink --file ${wd}"/ld/"${disease}_CEU --extract ${wd}"/snps/snps_to_keep.rs" --
 # will report all the LD relationships over the threshold between each of our combi_nn snps and all the GWAS Catalog snps for that trait
 while read snp; do
     echo ${snp}
-    plink --bfile ${wd}"/ld/"${disease}_CEU_rs --ld-snp ${snp} --ld-window-kb 500 --ld-window-r2 0.2 --r2 --ld-window 99999 --silent --out ${wd}"/ld/"${snp}
+    plink --bfile ${wd}"/ld/"${disease}_CEU_rs --ld-snp ${snp} --ld-window-kb 500 --ld-window-r2 ${r2thresh} --r2 --ld-window 99999 --silent --out ${wd}"/ld/"${snp}
 done < <(awk -F'\t' '{print $4}' ${wd}/snps_combi_${disease}.bed)
 
 
@@ -155,8 +155,16 @@ comm -12 <(cut -f4 ${wd}/${disease}_hg38_to_hg19.bed | sort) <(cut -f4 ${wd}/snp
 # For each of the types of SNPs, find their respective entries in the GWAS Catalog associations...
 # ...only to complete more info.
 # Note that for those ld proxies the SNP that is featured and searched in the Catalog is the one in LD (column 6 of the {snp}.ld file), and not the SNP found by DeepCOMBI itself.
+## Basically, we are trying to identify which are the SNPs that appear in the Catalog which are in LD with our candidate.
 cat ${folder}/header_GWASCat <(grep -wf ${wd}"/ld/direct_candidates_"${disease} ${wd}/${disease}.assoc) > ${wd}"/ld/direct_candidates_"${disease}.assoc
 cat ${folder}/header_GWASCat <(grep -wf <(cut -f6 ${wd}"ld/ld_candidates_"${disease} | sort | uniq) ${wd}/${disease}.assoc) > ${wd}"/ld/ld_candidates_"${disease}.assoc
+
+# We need to add these two lines in order to get the really validated ones.
+## First, we get those candidates that were truly found in the catalog, which are in LD with some of our candidates.
+cut -f22 ${wd}"/ld/ld_candidates_"${disease}.assoc | sed 1d | uniq > ${wd}"/ld/"ld.found.assoc
+### Then, we search for them in the LD full list to get the original candidates, which is then merged with the direct candidates. 
+cat <(grep -wf ${wd}"/ld/"ld.found.assoc ${wd}"ld/ld_candidates_"${disease} | cut -f3 | sort | uniq) ${wd}"/ld/direct_candidates_"${disease} | sort | uniq > ${wd}"/ld/final_all_"${disease}
+
 
 echo "All done!"
 
